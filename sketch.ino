@@ -1,4 +1,3 @@
-ich habe diesen chatroom gebaut wie mache ich das er auch aus dem Internet verfügbar ist? 
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
