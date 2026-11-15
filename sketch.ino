@@ -1,6 +1,10 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x26, 16, 2);
 
 // WLAN
 const char* ssid = "Open Chatroom";
@@ -356,6 +360,14 @@ void handleSend() {
   }
 
   digitalWrite(2, HIGH);
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print(name + ":");
+
+  lcd.setCursor(0, 1);
+  lcd.print(message);
+
   delay(500);
   digitalWrite(2, LOW);
 
@@ -419,8 +431,13 @@ void setup() {
   Serial.begin(115200);
   pinMode(2, OUTPUT);
 
+  Wire.begin(21, 22);
+
+	lcd.init();                      
+  lcd.backlight();
+  lcd.setCursor(0, 0); 
+
   Serial.println();
-  Serial.println("ESP32 Chat startet...");
 
   WiFi.mode(WIFI_AP);
 
