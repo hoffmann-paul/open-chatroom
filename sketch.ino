@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
+// Lcd Adress
 LiquidCrystal_I2C lcd(0x26, 16, 2);
 
 // WLAN
@@ -15,7 +16,7 @@ DNSServer dnsServer;
 
 const byte DNS_PORT = 53;
 
-// Nachrichten
+// message struc
 struct Message {
   uint32_t id;
   String name;
@@ -31,7 +32,7 @@ int messagePosition = 0;
 
 uint32_t nextMessageId = 1;
 
-// Webseite
+// html
 const char webpage[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="de">
@@ -297,7 +298,7 @@ setInterval(updateMessages, 800);
 </html>
 )rawliteral";
 
-// JSON-Escaping
+// Do NOT TOUCH This Part i dont know how this shit works
 String jsonEscape(const String &input) {
 
   String output;
@@ -319,7 +320,7 @@ String jsonEscape(const String &input) {
   return output;
 }
 
-// Chat anzeigen
+// Handle the chat window
 void handleRoot() {
 
   server.send(
@@ -330,7 +331,7 @@ void handleRoot() {
 
 }
 
-// Nachrichten senden
+// message send thing
 void handleSend() {
 
   String name = server.arg("name");
@@ -377,7 +378,7 @@ void handleSend() {
 
 }
 
-// Nachrichten abrufen
+// Get new messages
 void handleMessages() {
 
   uint32_t since = server.arg("since").toInt();
@@ -418,7 +419,7 @@ void handleMessages() {
 
 }
 
-// Captive Portal: unbekannte URLs auf den Chat umleiten
+// captive Wlan open site thing
 void handleNotFound() {
 
   server.sendHeader("Location", "http://192.168.4.1/", true);
@@ -431,17 +432,17 @@ void setup() {
   Serial.begin(115200);
   pinMode(2, OUTPUT);
 
+  // Init LCD Display
   Wire.begin(21, 22);
-
-	lcd.init();                      
+  lcd.init();                      
   lcd.backlight();
   lcd.setCursor(0, 0); 
 
   Serial.println();
 
+
   WiFi.mode(WIFI_AP);
 
-  // Offenes WLAN ohne Passwort
   WiFi.softAP(ssid);
 
   IPAddress ip = WiFi.softAPIP();
@@ -453,19 +454,19 @@ void setup() {
   Serial.print("IP: ");
   Serial.println(ip);
 
-  // DNS: Alle Namen auf den ESP32 umleiten
+  // Dns handling
   dnsServer.start(
     DNS_PORT,
     "*",
     ip
   );
 
-  // Webseiten-Routen
+  // Routs
   server.on("/", HTTP_GET, handleRoot);
   server.on("/send", HTTP_POST, handleSend);
   server.on("/messages", HTTP_GET, handleMessages);
 
-  // Apple / Android / Windows Captive-Portal-Prüfungen
+  // Captive portal checks
   server.on("/generate_204", HTTP_GET, handleRoot);
   server.on("/gen_204", HTTP_GET, handleRoot);
   server.on("/hotspot-detect.html", HTTP_GET, handleRoot);
